@@ -37,6 +37,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Place
@@ -47,6 +48,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -87,6 +90,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.vamz.ui.theme.VAMZTheme
 
 class MainActivity : ComponentActivity() {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -103,12 +108,15 @@ class MainActivity : ComponentActivity() {
                     composable("mapa") {
                         PrvyNahlad(navController)
                     }
+                    composable("vyhladaj") {
+                        VyhladajNahlad()
+                    }
                 }
             }
         }
     }
 }
-
+val farbaPozadia = Color(144,238,144)
 
 
 @Composable
@@ -186,7 +194,7 @@ fun strednaCastMain() {
 @Composable
 fun PrvyNahlad(navController: NavController){
     Column (
-        modifier = Modifier.background(Color(144,238,144))
+        modifier = Modifier.background(farbaPozadia)
     ) {
         Spacer(modifier = Modifier.size(16.dp))
         HornaListaMain(navController)
@@ -202,7 +210,7 @@ fun MenuNahlad(navController: NavController){
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(144, 238, 144))
+            .background(farbaPozadia)
     ) {
 
         IconButton(
@@ -221,7 +229,7 @@ fun MenuNahlad(navController: NavController){
         Spacer(modifier = Modifier.size(16.dp))
 
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = { navController.navigate("vyhladaj") },
             modifier = Modifier
                 .size(64.dp)
         )
@@ -272,13 +280,20 @@ fun VyhladajNahlad() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(farbaPozadia)
             .padding(16.dp)
+
     ) {
-        TextField(
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null)},
             value = searchText,
+            label = { Text("Vyhladaj") },
             onValueChange = viewModel::onSearchTextChange,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = "Vyhladaj")}
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = Color.White
+            )
         )
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn (
@@ -287,12 +302,14 @@ fun VyhladajNahlad() {
                 .weight(1f)
         ){
             items(persons) {person ->
-                Text(
-                    text = "${person.firstName} ${person.lastName}",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
-                )
+                Row {
+                    Text(
+                        text = "${person.firstName} ${person.lastName}",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp)
+                    )
+                }
             }
         }
     }
@@ -307,5 +324,6 @@ fun GreetingPreview() {
     VAMZTheme {
         //PrvyNahlad()
         //MenuNahlad()
+        VyhladajNahlad()
     }
 }
