@@ -55,13 +55,16 @@ data class Material(
 
 // Assuming you have drawable resources with these names
 private val allMaterials = listOf(
-    Material("White Iron Chunk", R.drawable.mapchenyun, "mapchenyun"),
-    Material("White Iron Chunk", R.drawable.mapchenyun, "mapchenyun"),
-    Material("White Iron Chunk", R.drawable.mapchenyun, "mapchenyun"),
-    Material("Crystal Chunk", R.drawable.mapchenyun, "mapchenyun"),
-    Material("Magical Crystal Chunk", R.drawable.mapchenyun, "mapchenyun"),
-    Material("Iron Chunk", R.drawable.mapchenyun, "mapchenyun"),
-    Material("Clearwater Jade", R.drawable.mapchenyun, "mapchenyun"),
-    Material("Qingxin", R.drawable.mapchenyun, "mapchenyun"),
-    Material("Violetgrass", R.drawable.mapchenyun, "mapchenyun")
+    Material("White Iron Chunk", R.drawable.chizhangwallwhiteironchunk, "Chizhang Wall"),
+    Material("White Iron Chunk", R.drawable.chiwangterracewhiteironchunk, "Chiwang Terrace"),
+    Material("Crystal Chunk", R.drawable.mtlingmengcrystalchunk, "Mt. Lingmeng"),
+    Material("Crystal Chunk", R.drawable.chizhangwallcrystalchunk, "Chizhang Wall"),
+    Material("Magical Crystal Chunk", R.drawable.qiaoyingvillagemagicalcrystalchunk, "Qiaoying Village"),
+    Material("Clearwater Jade", R.drawable.mtlingmengclearwaterjade, "Mt. Lingmeng"),
+    Material("Clearwater Jade", R.drawable.chizhangwallclearwaterjade, "Chizhang Wall"),
+    Material("Clearwater Jade", R.drawable.teatreeslopeclearwaterjade, "Teatree Slope"),
+    Material("Clearwater Jade", R.drawable.yaodievalleyclearwaterjade, "Yaodie Valley"),
+    Material("Qingxin", R.drawable.yaodievalleyqingxin, "Yaodie Valley"),
+    Material("Qingxin", R.drawable.chiwangterraceqingxin, "Chiwang Terrace"),
+    Material("Violetgrass", R.drawable.chiwangterracevioletgrass, "Chiwang Terrace")
 )

@@ -84,10 +84,6 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable("menu") {//entry ->
                         MenuNahlad(navController)
-                        /*val material = entry.savedStateHandle.get<String>("hladanyMaterial")
-                        material?.let {
-                            Text(text = material)
-                        }*/
                     }
                     composable("mapa") {
                         PrvyNahlad(navController)
@@ -344,22 +340,21 @@ fun vysledokHladania(navController: NavController, material: String?) {
                     fontWeight = FontWeight.Bold
                 )
             }
-
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(materialy) { _material ->
                     if (_material.nazovMaterialu == material) {
+                        Text(
+                            text = "Lokácia: ${_material.lokacia}",
+                            modifier = Modifier.padding(8.dp)
+                        )
                         Image(
                             painter = painterResource(id = _material.imageRes),
                             contentDescription = _material.nazovMaterialu,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)
-                        )
-                        Text(
-                            text = "Location: ${_material.lokacia}",
-                            modifier = Modifier.padding(8.dp)
                         )
                     }
                 }
