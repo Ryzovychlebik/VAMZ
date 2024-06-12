@@ -1,9 +1,7 @@
 package com.example.vamz
 
-import android.app.DownloadManager.Query
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,11 +15,13 @@ class SearchViewModel: ViewModel(){
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
 
-    private val _persons = MutableStateFlow(allPersons)
-    val persons = searchText
-        .combine(_persons) { text, persons ->
+    private val _materialy = MutableStateFlow(allMaterials)
+    val materialy = searchText
+        .combine(_materialy) { text, persons ->
             if(text.isBlank()) {
-                persons
+                persons.filter {
+                    it.sediSVyhladavanim("-")
+                }
             }else{
                 persons.filter {
                     it.sediSVyhladavanim(text)
@@ -31,35 +31,38 @@ class SearchViewModel: ViewModel(){
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
-            _persons.value
+            _materialy.value
         )
     fun onSearchTextChange(text: String) {
         _searchText.value = text
     }
 }
 
-data class Person(
-    val firstName: String,
-    val lastName: String
+data class Material(
+    val nazovMaterialu: String,
+    //val lastName: String,
+    val lokacia: Int
+
 ) {
     fun sediSVyhladavanim(query: String): Boolean {
         val sediacaKombinacia = listOf(
-            "$firstName$lastName",
-            "$firstName $lastName",
-            "${firstName.first()} ${lastName.first()}"
+            "$nazovMaterialu",
+            "${nazovMaterialu.first()}"
         )
         return sediacaKombinacia.any {
             it.contains(query, ignoreCase = true)
         }
     }
+
 }
 
-private val allPersons = listOf(
-    Person("Marek", "Parek"),
-    Person("Karol", "Falol"),
-    Person("Denis", "Vahola"),
-    Person("Tereziana", "Lietavska"),
-    Person("Kajko", "Vajko"),
-    Person("Lukas", "Sustr"),
-    Person("Filip", "Detolez"),
+private val allMaterials = listOf(
+    Material("White Iron Chunk", R.drawable.mapchenyun),
+    Material("White Iron Chunk", R.drawable.mapchenyun),
+    Material("Crystal Chunk", R.drawable.mapchenyun),
+    Material("Magical Crystal Chunk", R.drawable.mapchenyun),
+    Material("Iron Chunk", R.drawable.mapchenyun),
+    Material("Clearwater Jade", R.drawable.mapchenyun),
+    Material("Qingxin", R.drawable.mapchenyun),
+    Material("Violetgrass", R.drawable.mapchenyun),
 )
