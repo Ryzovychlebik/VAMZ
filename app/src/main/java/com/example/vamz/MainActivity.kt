@@ -1,6 +1,8 @@
 package com.example.vamz
 
+import android.content.Context
 import android.os.Bundle
+import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -29,15 +31,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -57,9 +62,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.vamz.ui.theme.VAMZTheme
 
 class MainActivity : ComponentActivity() {
@@ -75,14 +82,23 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     startDestination = "menu"
                 ) {
-                    composable("menu") {
+                    composable("menu") {//entry ->
                         MenuNahlad(navController)
+                        /*val material = entry.savedStateHandle.get<String>("hladanyMaterial")
+                        material?.let {
+                            Text(text = material)
+                        }*/
                     }
                     composable("mapa") {
                         PrvyNahlad(navController)
                     }
                     composable("vyhladaj") {
-                        VyhladajNahlad()
+                        VyhladajNahlad(navController)
+                    }
+                    composable("vysledokHladania/{arg1}", arguments = listOf(
+                        navArgument("arg1") { type = NavType.StringType}
+                    )){entry ->
+                        vysledokHladania(navController = navController, entry.arguments?.getString("arg1"))
                     }
                 }
             }
@@ -245,17 +261,17 @@ fun MenuNahlad(navController: NavController){
 }
 
 @Composable
-fun VyhladajNahlad() {
+fun VyhladajNahlad(navController: NavController) {
     val viewModel = viewModel<SearchViewModel>()
     val searchText by viewModel.searchText.collectAsState()
     val materialy by viewModel.materialy.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(farbaPozadia)
             .padding(16.dp)
-
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
@@ -265,8 +281,10 @@ fun VyhladajNahlad() {
             onValueChange = viewModel::onSearchTextChange,
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = Color.White
-            )
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White,
+                focusedPlaceholderColor = Color.White,
+            ),
         )
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn (
@@ -275,16 +293,28 @@ fun VyhladajNahlad() {
                 .weight(1f)
         ){
             var predosly = ""
+
             items(materialy) { material ->
                 if (material.nazovMaterialu != predosly)
                 {
-                    Row {
-                        Text(
-                            text = material.nazovMaterialu,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp)
-                        )
+                    Row(modifier = Modifier
+                        .fillMaxSize()) {
+                        OutlinedButton(
+                            onClick = {
+                                /*navController.previousBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("hladanyMaterial", material.nazovMaterialu)
+                                navController.popBackStack()*/
+                                      navController.navigate("vysledokHladania/${material.nazovMaterialu}")
+                                },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            )
+                        ) {
+                            Text(text = material.nazovMaterialu)
+                            Icon(Icons.Filled.Face, contentDescription = null)
+                        }
                         predosly = material.nazovMaterialu
                     }
                 }
@@ -292,6 +322,53 @@ fun VyhladajNahlad() {
         }
     }
 }
+
+@Composable
+fun vysledokHladania(navController: NavController, material: String?) {
+    val viewModel = viewModel<SearchViewModel>()
+    val materialy by viewModel.materialy.collectAsState()
+
+    if (material != null) {
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            ) {
+                IconButton(onClick = { navController.navigate("menu") }) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back to Menu")
+                }
+                Text(
+                    text = material,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(materialy) { _material ->
+                    if (_material.nazovMaterialu == material) {
+                        Image(
+                            painter = painterResource(id = _material.imageRes),
+                            contentDescription = _material.nazovMaterialu,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        )
+                        Text(
+                            text = "Location: ${_material.lokacia}",
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 
 @Preview(
     showBackground = true,
@@ -302,6 +379,6 @@ fun GreetingPreview() {
     VAMZTheme {
         //PrvyNahlad()
         //MenuNahlad()
-        VyhladajNahlad()
+        //VyhladajNahlad()
     }
 }
